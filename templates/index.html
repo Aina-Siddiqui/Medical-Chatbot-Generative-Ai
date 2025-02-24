@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="static/style.css">
+    <title>Chatbot - Brave Coder</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">Medical Chatbot</div>
+        <div class="box" id="chat-box">
+            <div class="item">
+                <div class="icon">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="msg">
+                    <p>Hello! How can I help you?</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-area">
+            <div class="input-field">
+                <input type="text" id="user-input" placeholder="Type your message" required>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+   
+     
+
+        <script>
+         function sendMessage() {
+            let userInput = document.getElementById("user-input").value;
+            if (userInput.trim() === "") return; // Prevent empty messages
+
+            let chatBox = document.getElementById("chat-box");
+
+            // Add user message to chat UI
+            let userMessage = `<div class="item right">
+                <div class="msg"><p>${userInput}</p></div>
+            </div>`;
+            chatBox.innerHTML += userMessage;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Send user message to Flask backend
+            fetch('/get', {
+                method: 'POST',
+                body: new URLSearchParams({ 'msg': userInput }),  // Send message as form data
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+        .then(response => response.text())
+        .then(botResponse => {
+            // Add bot response to chat UI
+            let botMessage = `<div class="item">
+                <div class="icon"><i class="fa fa-user"></i></div>
+                <div class="msg"><p>${botResponse}</p></div>
+            </div>`;
+            chatBox.innerHTML += botMessage;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        })
+        .catch(error => console.error("Error:", error));
+
+        // Clear input field
+        document.getElementById("user-input").value = "";
+    }
+</script>
+
+    
+</body>
+</html>
